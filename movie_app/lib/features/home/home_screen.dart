@@ -6,6 +6,8 @@ import 'package:movie_app/networking/api_constants.dart';
 import 'package:movie_app/widgets/Trending_slider.dart';
 import 'package:movie_app/widgets/custom_slider.dart';
 
+import 'package:movie_app/colors.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -28,115 +30,135 @@ class _HomeScreenState extends State<HomeScreen> {
     nowPlayingMovies = Api().getNowPlayingMovies();
   }
 
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colours.accentColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: GoogleFonts.outfit(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search, color: Colors.white, size: 28),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SearchScreen()),
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
               );
             },
           ),
         ],
-        elevation: 0,
         title: Image.asset(
           'assets/flutflix.png',
           fit: BoxFit.cover,
-          height: 40,
+          height: 35,
           filterQuality: FilterQuality.high,
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 8),
-              Text('Trending Movies', style: GoogleFonts.aBeeZee(fontSize: 25)),
-              SizedBox(height: 16),
-              SizedBox(
-                child: FutureBuilder(
-                  future: trendingMovies,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text(snapshot.error.toString()));
-                    } else if (snapshot.hasData) {
-                      //final data = snapshot.data;
-                      return TrendingSlider(snapshot: snapshot);
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              child: FutureBuilder(
+                future: trendingMovies,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error.toString()));
+                  } else if (snapshot.hasData) {
+                    return TrendingSlider(snapshot: snapshot);
+                  } else {
+                    return const SizedBox(
+                      height: 450,
+                      child: Center(child: CircularProgressIndicator(color: Colours.accentColor)),
+                    );
+                  }
+                },
               ),
-              SizedBox(height: 32),
-              Text(
-                'Top rated movies',
-                style: GoogleFonts.aBeeZee(fontSize: 25),
+            ),
+            const SizedBox(height: 24),
+            _buildSectionHeader('Top Rated Movies'),
+            const SizedBox(height: 8),
+            SizedBox(
+              child: FutureBuilder(
+                future: topRatedMovies,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error.toString()));
+                  } else if (snapshot.hasData) {
+                    return CustomSlider(snapshot: snapshot);
+                  } else {
+                    return const Center(child: CircularProgressIndicator(color: Colours.accentColor));
+                  }
+                },
               ),
-              SizedBox(height: 16),
-              SizedBox(
-                child: FutureBuilder(
-                  future: topRatedMovies,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text(snapshot.error.toString()));
-                    } else if (snapshot.hasData) {
-                      return CustomSlider(snapshot: snapshot);
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
+            ),
+            const SizedBox(height: 24),
+            _buildSectionHeader('Upcoming Movies'),
+            const SizedBox(height: 8),
+            SizedBox(
+              child: FutureBuilder(
+                future: upComingMovies,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error.toString()));
+                  } else if (snapshot.hasData) {
+                    return CustomSlider(snapshot: snapshot);
+                  } else {
+                    return const Center(child: CircularProgressIndicator(color: Colours.accentColor));
+                  }
+                },
               ),
-              SizedBox(height: 32),
-              Text('Upcoming movies', style: GoogleFonts.aBeeZee(fontSize: 25)),
-              SizedBox(height: 16),
-              SizedBox(
-                child: FutureBuilder(
-                  future: upComingMovies,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text(snapshot.error.toString()));
-                    } else if (snapshot.hasData) {
-                      return CustomSlider(snapshot: snapshot);
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
+            ),
+            const SizedBox(height: 24),
+            _buildSectionHeader('Now Playing'),
+            const SizedBox(height: 8),
+            SizedBox(
+              child: FutureBuilder(
+                future: nowPlayingMovies,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text(snapshot.error.toString()));
+                  } else if (snapshot.hasData) {
+                    return CustomSlider(snapshot: snapshot);
+                  } else {
+                    return const Center(child: CircularProgressIndicator(color: Colours.accentColor));
+                  }
+                },
               ),
-              SizedBox(height: 32),
-              Text(
-                'Now playing movies',
-                style: GoogleFonts.aBeeZee(fontSize: 25),
-              ),
-              SizedBox(height: 16),
-              SizedBox(
-                child: FutureBuilder(
-                  future: nowPlayingMovies,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text(snapshot.error.toString()));
-                    } else if (snapshot.hasData) {
-                      //final data = snapshot.data;
-                      return CustomSlider(snapshot: snapshot);
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );
